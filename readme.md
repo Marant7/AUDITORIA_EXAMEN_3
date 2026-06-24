@@ -11,6 +11,7 @@
 | **Período Auditado** | Desde 01/06/2026 hasta 24/06/2026 |
 | **Equipo Auditor** | Mario Antonio Flores Ramos – Auditor Líder de Sistemas |
 | **Fecha del Informe** | 24/06/2026 |
+| **LINK GITHUB** | https://github.com/Marant7/AUDITORIA_EXAMEN_3 |
 
 ---
 
