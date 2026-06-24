@@ -51,7 +51,7 @@ app.add_middleware(
 Instrumentator().instrument(app).expose(app)
 
 
-llm = OllamaLLM(model="llama3.1:8b", temperature=0, base_url="http://host.docker.internal:11434")
+llm = OllamaLLM(model="smollm:360m", temperature=0, base_url="http://host.docker.internal:11434")
 embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
 vector_store = Chroma(persist_directory=VECTOR_STORE_DIR, embedding_function=embeddings)
 retriever = vector_store.as_retriever()
@@ -95,11 +95,18 @@ router_prompt = PromptTemplate(
     partial_variables={"format_instructions": output_parser.get_format_instructions()},
 )
 def extract_json_from_string(text: str) -> str:
-    match = re.search(r'\{.*\}', text, re.DOTALL)
-    # Si no encuentra JSON o la pregunta es muy corta, es probable que sea una despedida
-    if not match and len(text) < 20:
+    text_lower = text.lower()
+    if "reporte_de_problema" in text_lower:
+        return '{"intent": "reporte_de_problema"}'
+    elif "despedida" in text_lower:
         return '{"intent": "despedida"}'
-    return match.group(0) if match else '{"intent": "pregunta_general"}'
+    elif "pregunta_general" in text_lower:
+        return '{"intent": "pregunta_general"}'
+    
+    # Fallback
+    if len(text) < 20:
+        return '{"intent": "despedida"}'
+    return '{"intent": "pregunta_general"}'
 
 router_chain = router_prompt | llm | RunnableLambda(extract_json_from_string) | output_parser
 
